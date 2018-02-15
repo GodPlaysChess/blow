@@ -2,16 +2,25 @@
 
 module Main where
 
-import Web.Scotty
+import           Data.Text.Lazy         as T (pack)
+import           NLP.Hext.NaiveBayes    (emptyModel, runBayes, teach)
+import           Probability.Classifier (classifiedDocs)
+import           Web.Scotty
+
+
 
 main :: IO ()
-main =  scotty 3000 $ do 
-  get "/" $ do
-    html "hello world"
+main = learningMain
 
-  get "/hello" $ do 
-     text "nothing to look up here"
+scottyMain :: IO ()
+scottyMain = scotty 3000 $ do
+  get "/" $ html "hello world"
+  get "/hello" $ text "nothing to look up here"
 
 
-plus2 :: Integer -> Integer
-plus2 = (+ 12)
+learningMain :: IO ()
+learningMain = do
+  let material = foldl (\m (sample, cl) -> teach (T.pack sample) cl m) emptyModel
+  let review = "I loved the great acting"
+  let result = runBayes (material classifiedDocs) review
+  putStrLn $ "The review '" ++ review ++ "' is " ++ show result
