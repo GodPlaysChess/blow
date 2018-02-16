@@ -19,6 +19,5 @@ docs = [doc1, doc2, doc3, doc4, doc5]
 correspondingClasses :: [Class]
 correspondingClasses = [Positive, Negative, Positive, Negative, Positive]
 
-
 classifiedDocs :: [(String, Class)]
 classifiedDocs = zip docs correspondingClasses
