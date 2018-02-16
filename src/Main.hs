@@ -21,6 +21,6 @@ scottyMain = scotty 3000 $ do
 learningMain :: IO ()
 learningMain = do
   let material = foldl (\m (sample, cl) -> teach (T.pack sample) cl m) emptyModel
-  let review = "I loved the great acting"
+  review <- readFile "./dist/resources/review1.txt"
   let result = runBayes (material classifiedDocs) review
   putStrLn $ "The review '" ++ review ++ "' is " ++ show result

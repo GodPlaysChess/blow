@@ -17,8 +17,6 @@ instance Show Prob where
 data Perhaps a = Perhaps a Prob
       deriving (Show, Functor)
 
-
-
 neverHappens :: Perhaps a -> Bool
 neverHappens (Perhaps _ 0) = True
 neverHappens _             = False

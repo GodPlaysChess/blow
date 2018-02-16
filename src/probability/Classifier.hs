@@ -3,10 +3,6 @@ where
 
 data Class = Positive | Negative deriving (Eq, Show, Ord)
 
--- instance Ord Class where
---      Positive <= Negative = GT
-
-
 doc1 :: String
 doc1 = "I loved the movie"
 
