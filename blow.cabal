@@ -22,3 +22,5 @@ executable blow
                       , scotty
                       , text
                       , hext >= 0.1.0.4
+                      , transformers >= 0.3.0.0
+                      , cereal >= 0.5.5.0
