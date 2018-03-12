@@ -41,8 +41,8 @@ writeModel = undefined -- writeFile $ encode
 updateModel :: T.Text -> Class -> BayesModel Class -> BayesModel Class
 updateModel = teach
 
---classify :: BayesModel Class -> String -> Class
---classify = runBayes
+classify :: BayesModel Class -> String -> Class
+classify = runBayes
 -- reads
-classify :: String -> [(String, Class)] -> Class
-classify text model = runBayes model text
+--classify :: String -> [(String, Class)] -> Class
+--classify text model = runBayes model text

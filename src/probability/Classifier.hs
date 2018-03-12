@@ -10,7 +10,10 @@ doc2 :: String
 doc2 = "I hated the movie"
 
 doc3 = "a great movie. good movie"
+
+doc4 :: String
 doc4 = "poor acting"
+
 doc5 = "great acting. a good movie"
 
 docs :: [String]
