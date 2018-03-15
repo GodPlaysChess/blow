@@ -1,7 +1,13 @@
+{-# LANGUAGE DeriveGeneric #-}
+
+
 module Probability.Classifier
 where
 
-data Class = Positive | Negative deriving (Eq, Show, Ord)
+import           GHC.Generics (Generic)
+
+
+data Class = Positive | Negative deriving (Eq, Show, Ord, Generic)
 
 doc1 :: String
 doc1 = "I loved the movie"

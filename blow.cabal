@@ -26,3 +26,4 @@ executable blow
                       , cereal >= 0.5.5.0
                       , directory >= 1.3.0.2
                       , transformers >= 0.5.2.0
+                      , bytestring >= 0.10
