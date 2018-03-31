@@ -1,13 +1,22 @@
-{-# LANGUAGE DeriveGeneric #-}
-
+{-# LANGUAGE DeriveAnyClass     #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE FlexibleInstances  #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module Probability.Classifier
 where
 
-import           GHC.Generics (Generic)
-
+import           Data.Serialize      (Serialize)
+import           GHC.Generics        (Generic)
+import           NLP.Hext.NaiveBayes
 
 data Class = Positive | Negative deriving (Eq, Show, Ord, Generic)
+
+deriving instance Generic (BayesModel Class)
+
+instance Serialize Class
+--instance Serialize (BayesModel Class)
 
 doc1 :: String
 doc1 = "I loved the movie"

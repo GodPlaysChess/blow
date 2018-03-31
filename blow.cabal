@@ -27,3 +27,19 @@ executable blow
                       , directory >= 1.3.0.2
                       , transformers >= 0.5.2.0
                       , bytestring >= 0.10
+                      , natural-transformation >= 0.4
+                      , hspec
+                      --, serialise == 0.2.*
+                      --, cborg == 0.2.*
+
+test-suite unit-tests
+  type:                 exitcode-stdio-1.0
+  main-is:              Spec.hs
+  hs-source-dirs:       test
+  ghc-options:          -Wall
+  build-depends:        base
+                        , hspec == 2.*
+                        , hspec-discover
+  other-modules:
+    Probability.Serialize.BayesReprSpec
+  

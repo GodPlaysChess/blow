@@ -8,6 +8,7 @@ module Main where
 import           NLP.Hext.NaiveBayes    (BayesModel, emptyModel, runBayes,
                                          teach)
 -- import           Control.Monad.Trans    (liftIO)
+--import           Control.Trans          ((~>))
 import           Data.ByteString        as BS (readFile, writeFile)
 import           Data.Serialize         as S (Serialize, decode, encode, get,
                                               put)
@@ -19,7 +20,7 @@ import           Probability.Classifier (Class, classifiedDocs)
 import           System.Directory       (listDirectory)
 import           Web.Scotty             as Rest (get, html, scotty, text)
 
-instance Serialize (BayesModel Class)
+-- instance Serialize (BayesModel Class)
 
 main :: IO ()
 main = learningMain
@@ -44,10 +45,10 @@ storagePath :: FilePath
 storagePath = "./dist/resources/modelstorage/bayesmodel"
 
 readModel :: IO (Either String (BayesModel Class))
-readModel =  decode <$> BS.readFile storagePath
+readModel =  undefined -- decode <$> BS.readFile storagePath
 
 writeModel :: BayesModel Class -> IO ()
-writeModel model = BS.writeFile storagePath (runPut $ put model)
+writeModel model = undefined -- BS.writeFile storagePath (runPut $ put model)
 
 -- delete them in the end. They are here just to memoize faster what's going on.
 updateModel :: T.Text -> Class -> BayesModel Class -> BayesModel Class
