@@ -1,22 +1,17 @@
-{-# LANGUAGE DeriveAnyClass     #-}
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric      #-}
-{-# LANGUAGE FlexibleInstances  #-}
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Probability.Classifier
+
 where
 
-import           Data.Serialize      (Serialize)
-import           GHC.Generics        (Generic)
-import           NLP.Hext.NaiveBayes
+import           Data.Serialize (Serialize)
+import           GHC.Generics   (Generic)
 
 data Class = Positive | Negative deriving (Eq, Show, Ord, Generic)
 
-deriving instance Generic (BayesModel Class)
-
 instance Serialize Class
---instance Serialize (BayesModel Class)
 
 doc1 :: String
 doc1 = "I loved the movie"
@@ -24,11 +19,13 @@ doc1 = "I loved the movie"
 doc2 :: String
 doc2 = "I hated the movie"
 
+doc3 :: String
 doc3 = "a great movie. good movie"
 
 doc4 :: String
 doc4 = "poor acting"
 
+doc5 :: String
 doc5 = "great acting. a good movie"
 
 docs :: [String]

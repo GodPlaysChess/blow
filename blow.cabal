@@ -29,6 +29,9 @@ executable blow
                       , bytestring >= 0.10
                       , natural-transformation >= 0.4
                       , hspec
+                      , containers
+                      , unordered-containers
+                      , hashable
                       --, serialise == 0.2.*
                       --, cborg == 0.2.*
 
