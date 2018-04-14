@@ -3,20 +3,22 @@
 
 module Main where
 
-import           NLP.Hext.NaiveBayes    (BayesModel, emptyModel, runBayes,
-                                         teach)
+import           NLP.Hext.NaiveBayes             (BayesModel, emptyModel,
+                                                  runBayes, teach)
 -- import           Control.Monad.Trans    (liftIO)
 --import           Control.Trans          ((~>))
-import           Data.ByteString        as BS (readFile, writeFile)
-import           Data.Serialize         as S (Serialize, decode, encode, get,
-                                              put)
-import           Data.Serialize.Get     (runGet)
-import           Data.Serialize.Put     (Put, runPut)
-import           Data.Text.Lazy         as T (Text, pack)
-import           GHC.Generics           (Generic)
-import           Probability.Classifier (Class, classifiedDocs)
-import           System.Directory       (listDirectory)
-import           Web.Scotty             as Rest (get, html, scotty, text)
+import           Data.ByteString                 as BS (readFile, writeFile)
+import           Data.Serialize                  as S (Serialize, decode,
+                                                       encode, get, put)
+import           Data.Serialize.Get              (runGet)
+import           Data.Serialize.Put              (Put, runPut)
+import           Data.Text.Lazy                  as T (Text, pack)
+import           GHC.Generics                    (Generic)
+import           Probability.Classifier          (Class, classifiedDocs)
+import           Probability.Serialize.BayesRepr
+import           System.Directory                (listDirectory)
+import           Web.Scotty                      as Rest (get, html, scotty,
+                                                          text)
 
 -- instance Serialize (BayesModel Class)
 

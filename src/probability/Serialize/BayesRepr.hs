@@ -8,9 +8,10 @@ import           Control.Arrow           ((<<^))
 import           Control.Natural
 import qualified Data.Foldable           as F (fold, foldl)
 import qualified Data.HashMap.Lazy       as HM (HashMap (..), fromList, toList)
-import           Data.Map.Lazy           (Map (..), fromList, mapKeys, toList)
+import qualified Data.Map.Lazy           as M (Map (..), fromList, mapKeys,
+                                               toList)
 import           Data.Set                (Set)
---import           Data.Text              (Text (..))
+
 import           Data.Text.Lazy.Encoding (decodeUtf8, encodeUtf8)
 --import           Data.Text.Show         (unpack)
 import           Data.Hashable           (Hashable)
@@ -22,24 +23,25 @@ import           NLP.Hext.NaiveBayes     (BayesModel (..), FrequencyList (..),
                                           Labeled (..))
 import           Probability.Classifier  (Class, classifiedDocs)
 
-import           Data.Text.Lazy          (Text (..))
+import           Control.Arrow           ((&&&))
+import           Data.Text.Lazy          (Text (..), pack)
 
 
     -- Let's try to serialize this!
 data BayesRepr a = BayesRepr {
      cls :: Set a
-   , voc :: Map String Int
-   , mat :: [(Map String Int, a)]
+   , voc :: HM.HashMap Text Int
+   , mat :: [(HM.HashMap Text Int, a)]
 } deriving (Show, Eq, Generic)
-
-instance Serialize (BayesModel Class)
-instance Serialize (Labeled Class) where
-      put (Labeled h l) = putTwoOf put put (h, l)
-      get = get
-instance Generic (Labeled Class)
 
 instance Serialize (BayesRepr Class)
 
+-- instance Generic (BayesModel Class)
+-- instance Serialize (BayesModel Class)
+-- instance Serialize (Labeled Class) where
+--       put (Labeled h l) = putTwoOf put put (h, l)
+--       get = get
+-- instance Generic (Labeled Class)
 instance Serialize Text where
     put txt = put $ encodeUtf8 txt
     get     = fmap decodeUtf8 get
@@ -50,26 +52,24 @@ instance (Hashable k, Eq k, Serialize k, Serialize v) => Serialize (HM.HashMap k
 
 
 -- inline this:
-m2m ::Ord k => HM.HashMap k v -> Map k v
-m2m = fromList . HM.toList
+m2m :: Ord k => HM.HashMap k v -> M.Map k v
+m2m = M.fromList . HM.toList
 
-m2m' ::Ord k => HM.HashMap k v -> Map k v
-m2m' = undefined -- F.fold
+m2m' :: (Hashable k, Ord k) => M.Map k v -> HM.HashMap k v
+m2m' = HM.fromList . M.toList
 
 fromModel :: BayesModel a -> BayesRepr a
 fromModel (BayesModel c v m) = BayesRepr
     c
-    (mapKeys show $ m2m v)
-    (map (\l ->
-            (mapKeys show (m2m (hash l)), label l)) m
+    v
+    (map (hash Control.Arrow.&&& label) m
     )
 
 toModel :: BayesRepr a -> BayesModel a
 toModel (BayesRepr cls voc mat) = BayesModel
                                     cls
-                                    undefined -- (mapKeys fromString (HM.fromList . toList voc))
-                                    undefined -- (map (\l ->
-                                        -- (mapKeys fromString (HM.fromList . toList (hash l)), label l)))
+                                    voc
+                                    (map (uncurry Labeled) mat)
 
 
 
