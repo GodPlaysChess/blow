@@ -15,7 +15,7 @@ import           Probability.Serialize.BayesRepr
 import           System.Directory                (listDirectory)
 import           Web.Scotty                      as Rest (get, html, scotty,
                                                           text)
-
+import Data.Either(fromRight)                                                          
 
 main :: IO ()
 main = learningMain
@@ -24,12 +24,14 @@ scottyMain :: IO ()
 scottyMain = scotty 3000 $ do
   Rest.get "/" $ html "hello world"
   Rest.get "/hello" $ text "nothing to look up here"
- -- post "/train" $ undefined () --run classifier and return the result (as a feature, confirm if helpful -> adds the result to the training set)
+  Rest.get "/classify" $ text "classifies the given input. To be implemented"
+  Rest.get "/train" $ text "refine the model, given the additional classified input. to be implemented"
 
 --  read list of files from dir A, updates the model which is stored in some file
 learningMain :: IO ()
 learningMain = do
-  let material = foldl (\m (sample, cl) -> teach (T.pack sample) cl m) emptyModel
+  initialModel <- fromRight emptyModel <$> readModel
+  let material = foldl (\m (sample, cl) -> teach (T.pack sample) cl m) initialModel
   files <- listDirectory  ".dist/resources/learning"
   review <- pure "" -- BS.readFile "./dist/resources/review1.txt"
   let result = runBayes (material classifiedDocs) review
@@ -49,10 +51,9 @@ readModel = do
 writeModel :: BayesModel Class -> IO ()
 writeModel = BS.writeFile storagePath . S.encode . fromModel 
 
--- delete them in the end. They are here just to memoize faster what's going on.
-updateModel :: T.Text -> Class -> BayesModel Class -> BayesModel Class
-updateModel = teach
+-- updates the model given additional information
+updateModel :: BayesModel Class -> [(T.Text, Class)] -> BayesModel Class
+updateModel = foldl (\m (sample, cl) -> teach sample cl m)
 
 classify :: BayesModel Class -> String -> Class
 classify = runBayes
-
