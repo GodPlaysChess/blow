@@ -8,19 +8,14 @@ import           NLP.Hext.NaiveBayes             (BayesModel, emptyModel,
 -- import           Control.Monad.Trans    (liftIO)
 --import           Control.Trans          ((~>))
 import           Data.ByteString                 as BS (readFile, writeFile)
-import           Data.Serialize                  as S (Serialize, decode,
-                                                       encode, get, put)
-import           Data.Serialize.Get              (runGet)
-import           Data.Serialize.Put              (Put, runPut)
+import           Data.Serialize                  as S (decode, encode)
 import           Data.Text.Lazy                  as T (Text, pack)
-import           GHC.Generics                    (Generic)
 import           Probability.Classifier          (Class, classifiedDocs)
 import           Probability.Serialize.BayesRepr
 import           System.Directory                (listDirectory)
 import           Web.Scotty                      as Rest (get, html, scotty,
                                                           text)
 
--- instance Serialize (BayesModel Class)
 
 main :: IO ()
 main = learningMain
@@ -45,10 +40,14 @@ storagePath :: FilePath
 storagePath = "./dist/resources/modelstorage/bayesmodel"
 
 readModel :: IO (Either String (BayesModel Class))
-readModel =  undefined -- decode <$> BS.readFile storagePath
+readModel = do 
+              file <- BS.readFile storagePath
+              let bayesRepr = S.decode file
+              let bayesModel = toModel <$> bayesRepr
+              return bayesModel
 
 writeModel :: BayesModel Class -> IO ()
-writeModel model = undefined -- BS.writeFile storagePath (runPut $ put model)
+writeModel = BS.writeFile storagePath . S.encode . fromModel 
 
 -- delete them in the end. They are here just to memoize faster what's going on.
 updateModel :: T.Text -> Class -> BayesModel Class -> BayesModel Class
@@ -56,6 +55,4 @@ updateModel = teach
 
 classify :: BayesModel Class -> String -> Class
 classify = runBayes
--- reads
---classify :: String -> [(String, Class)] -> Class
---classify text model = runBayes model text
+

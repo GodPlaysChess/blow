@@ -2,7 +2,10 @@
 {-# LANGUAGE ExplicitForAll    #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Probability.Serialize.BayesRepr where
+module Probability.Serialize.BayesRepr (
+    fromModel
+  , toModel
+  ) where
 
 import           Control.Arrow           ((<<^))
 import           Control.Natural
