@@ -5,9 +5,8 @@ module Main where
 
 import           NLP.Hext.NaiveBayes             (BayesModel, emptyModel,
                                                   runBayes, teach)
--- import           Control.Monad.Trans    (liftIO)
---import           Control.Trans          ((~>))
 import           Data.ByteString                 as BS (readFile, writeFile)
+import qualified System.IO (readFile)
 import Data.ByteString.Char8 (unpack)
 import           Data.Serialize                  as S (decode, encode)
 import           Data.Text.Lazy                  as T (Text, pack)
@@ -16,29 +15,33 @@ import           Probability.Serialize.BayesRepr
 import           System.Directory                (listDirectory)
 import           Web.Scotty                      as Rest (get, html, scotty,
                                                           text)
+                                                          
 import Data.Either(fromRight) 
-import Control.Monad.IO.Class(liftIO)                                         
+import Control.Monad.IO.Class(liftIO)                     
+import Control.Monad((>>))       
+import Probability.Classifier(Class(..))
 
 main :: IO ()
-main = learningMain
+main = scottyMain
 
 scottyMain :: IO ()
 scottyMain = scotty 3000 $ do
   Rest.get "/" $ html "hello world"
-  Rest.get "/hello" $ Rest.text "nothing to look up here"
+  Rest.get "/hello" $ text "nothing to look up here"
+  Rest.get "/init" $ liftIO initializeModel >> text "Initializing the model"
   Rest.get "/classify" $ do 
                                   cl <- liftIO $ classifyFile controlDoc
                                   let txt = T.pack ("classifies the given input in the" ++ controlDoc ++ ".\n The result model is " ++ cl)
-                                  Rest.text txt
-  Rest.get "/train" $ Rest.text "refine the model, given the additional classified input. to be implemented"
+                                  text txt
+  Rest.get "/train" $ liftIO (refineModel trainPath Positive) >>
+           Rest.text "refined the model, given the additional classified input. to be implemented"
 
 
---  read list of files from dir A, updates the model which is stored in some file
-learningMain :: IO ()
-learningMain = do
-  initialModel <- fromRight emptyModel <$> readModel
-  let material = foldl (\m (sample, cl) -> teach (T.pack sample) cl m) initialModel
-  files <- listDirectory  ".dist/resources/learning"
+--  initialize the model based on models, stored in ./initial_training_set
+initializeModel :: IO ()
+initializeModel = do  
+  let material = foldl (\m (sample, cl) -> teach (T.pack sample) cl m) emptyModel
+  files <- listDirectory initialTrainingPath
   review <- pure "" -- BS.readFile "./dist/resources/review1.txt"
   let result = runBayes (material classifiedDocs) review
   putStrLn $ "The review '" ++ review ++ "' is " ++ show result
@@ -50,6 +53,10 @@ storagePath = "./dist/resources/modelstorage/bayesmodel"
 -- path for the model to be classified
 controlDoc :: FilePath
 controlDoc = "./dist/resources/to_classify"
+
+trainPath = "./dist/resources/to_train"
+
+initialTrainingPath = "./dist/resources/initial_training_set"
 
 readModel :: IO (Either String (BayesModel Class))
 readModel = do 
@@ -65,6 +72,14 @@ writeModel = BS.writeFile storagePath . S.encode . fromModel
 updateModel :: BayesModel Class -> [(T.Text, Class)] -> BayesModel Class
 updateModel = foldl (\m (sample, cl) -> teach sample cl m)
 
+refineModel :: FilePath -> Class -> IO ()
+refineModel filePath cl = do 
+                            initialModel <- fromRight emptyModel <$> readModel
+                            additionalModel <- System.IO.readFile filePath
+                            let newModel = updateModel initialModel [(T.pack additionalModel, cl)]
+                            writeModel newModel                          
+
+-- TODO move file from *to_classify* to *classified_models*
 classifyFile :: FilePath -> IO String
 classifyFile filePath = do 
                           model <- fromRight emptyModel <$> readModel
