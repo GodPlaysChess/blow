@@ -24,7 +24,7 @@ import           GHC.Generics            (Generic)
 
 import           NLP.Hext.NaiveBayes     (BayesModel (..), FrequencyList (..),
                                           Labeled (..))
-import           Probability.Classifier  (Class, classifiedDocs)
+import           Probability.Classifier  (Class)
 
 import           Control.Arrow           ((&&&))
 import           Data.Text.Lazy          (Text (..), pack)

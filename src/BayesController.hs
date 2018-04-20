@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module BayesController(
       refineModel
     , classifyFile
@@ -7,17 +9,19 @@ module BayesController(
 import           NLP.Hext.NaiveBayes             (BayesModel, emptyModel,
                                                   runBayes, teach)
                                                   
-import           Data.ByteString                 as BS (readFile, writeFile, ByteString)
+import           Data.ByteString                 as BS (readFile, writeFile)
 import qualified System.IO (readFile)
-import Data.ByteString.Char8 (unpack)
+import qualified Data.ByteString.Char8 as C8(unpack) 
 import           Data.Serialize                  as S (decode, encode)
-import           Data.Text.Lazy                  as T (Text, pack)
+import           Data.Text.Lazy                  as T (Text, pack, unpack, lines, span, strip)
 import           Data.Either(fromRight) 
-import           Probability.Classifier          (Class, classifiedDocs)
+import           Probability.Classifier          (Class)
 import           Probability.Serialize.BayesRepr (fromModel, toModel)
-import           System.Directory                (listDirectory)
-import           Data.List(isInfixOf)
 import           Control.Monad(forM)
+import Data.Bitraversable(bitraverse)
+import Data.Maybe(maybeToList)
+import Text.Read(readMaybe)
+import qualified Data.Text.Lazy.IO as T(readFile)
 
 
 
@@ -47,22 +51,26 @@ classifyFile :: FilePath -> IO String
 classifyFile filePath = do 
                             model <- fromRight emptyModel <$> readModel
                             modelToClassify <- BS.readFile filePath
-                            let result = runBayes model (unpack modelToClassify)
+                            let result = runBayes model (C8.unpack modelToClassify)
                             return $ "The review is " ++ show result
 
 --  initialize the model based on models, stored in ./initial_training_set and classified accordingly to /initial_training_set/classification
 initializeModel :: FilePath -> IO ()
 initializeModel path = do  
-    files <- filter (not . isInfixOf "classification") <$> (listDirectory path)
-    classificationFile <- BS.readFile (path ++ "/classification")
+    classificationFile <- T.readFile (path ++ "/classification")
     let classification = readClassification classificationFile
-    classifiedDocs <- forM classification (\(t, c) -> (BS.readFile (path ++ unpack t), c))
-    let result = runBayes (updateModel classifiedDocs) review
-    writeModel result
+    classifiedDocs <- forM classification (bitraverse (\t -> T.readFile (path ++ unpack t)) pure)
+    writeModel (updateModel emptyModel classifiedDocs)
 
-readClassification :: ByteString -> [(ByteString, Class)]
-readClassification = undefined
+readClassification :: Text -> [(Text, Class)]
+readClassification file = do 
+    line <- T.lines file
+    let (text, cltxt) = T.span (== '|') line
+    cl <- maybeToList . readMaybe . unpack . strip $ cltxt
+    return (text, cl)
 
 -- path for serialized BayesModel
 storagePath :: FilePath
 storagePath = "./dist/resources/modelstorage/bayesmodel"
+
+-- mapTuple = join (***)
