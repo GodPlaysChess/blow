@@ -59,7 +59,7 @@ initializeModel :: FilePath -> IO ()
 initializeModel path = do  
     classificationFile <- T.readFile (path ++ "/classification")
     let classification = readClassification classificationFile
-    classifiedDocs <- forM classification (bitraverse (\t -> T.readFile (path ++ unpack t)) pure)
+    classifiedDocs <- forM classification $ bitraverse (T.readFile . (path ++) . unpack) pure
     writeModel (updateModel emptyModel classifiedDocs)
 
 readClassification :: Text -> [(Text, Class)]
