@@ -5,46 +5,35 @@
 module Probability.Serialize.BayesRepr (
     fromModel
   , toModel
+  , BayesRepr(..)
   ) where
 
-import           Control.Arrow           ((<<^))
-import           Control.Natural
-import qualified Data.Foldable           as F (fold, foldl)
-import qualified Data.HashMap.Lazy       as HM (HashMap (..), fromList, toList)
-import qualified Data.Map.Lazy           as M (Map (..), fromList, mapKeys,
-                                               toList)
+import           Control.Natural         ()
+import qualified Data.HashMap.Lazy       as HM (HashMap, fromList, toList)
 import           Data.Set                (Set)
 
-import           Data.Text.Lazy.Encoding (decodeUtf8, encodeUtf8)
---import           Data.Text.Show         (unpack)
 import           Data.Hashable           (Hashable)
 import           Data.Serialize          (Serialize, get, put)
 import           Data.Serialize.Put      (putTwoOf)
+import           Data.Text.Lazy.Encoding (decodeUtf8, encodeUtf8)
 import           GHC.Generics            (Generic)
 
-import           NLP.Hext.NaiveBayes     (BayesModel (..), FrequencyList (..),
+import           NLP.Hext.NaiveBayes     (BayesModel (..), FrequencyList,
                                           Labeled (..))
 import           Probability.Classifier  (Class)
 
-import           Control.Arrow           ((&&&))
-import           Data.Text.Lazy          (Text (..), pack)
+import           Data.Text.Lazy          (Text)
 
 
-    -- Let's try to serialize this!
-data BayesRepr a = BayesRepr {
-     cls :: Set a
-   , voc :: HM.HashMap Text Int
-   , mat :: [(HM.HashMap Text Int, a)]
-} deriving (Show, Eq, Generic)
+data BayesRepr a = BayesRepr (Set a) FrequencyList [Labeled a] deriving (Generic, Show)
 
+instance Show a => Show (Labeled a)
 instance Serialize (BayesRepr Class)
 
--- instance Generic (BayesModel Class)
--- instance Serialize (BayesModel Class)
--- instance Serialize (Labeled Class) where
---       put (Labeled h l) = putTwoOf put put (h, l)
---       get = get
--- instance Generic (Labeled Class)
+instance Serialize (Labeled Class) where
+      put (Labeled h l) = putTwoOf put put (h, l)
+      get = get
+
 instance Serialize Text where
     put txt = put $ encodeUtf8 txt
     get     = fmap decodeUtf8 get
@@ -53,29 +42,11 @@ instance (Hashable k, Eq k, Serialize k, Serialize v) => Serialize (HM.HashMap k
     get = fmap HM.fromList get
     put = put . HM.toList
 
-
--- inline this:
-m2m :: Ord k => HM.HashMap k v -> M.Map k v
-m2m = M.fromList . HM.toList
-
-m2m' :: (Hashable k, Ord k) => M.Map k v -> HM.HashMap k v
-m2m' = HM.fromList . M.toList
-
 fromModel :: BayesModel a -> BayesRepr a
-fromModel (BayesModel c v m) = BayesRepr
-    c
-    v
-    (map (hash Control.Arrow.&&& label) m
-    )
+fromModel (BayesModel a b c) = BayesRepr a b c
 
 toModel :: BayesRepr a -> BayesModel a
-toModel (BayesRepr cls voc mat) = BayesModel
-                                    cls
-                                    voc
-                                    (map (uncurry Labeled) mat)
-
-
-
+toModel (BayesRepr a b c) = BayesModel a b c
 
 -- instance Transformation BayesRepr BayesModel _ where
     -- BayesRepr a # BayesModel a = undefined
