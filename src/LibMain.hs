@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main where
+module LibMain where
 
 import           Web.Scotty                      as Rest (get, html, scotty,
                                                           text)                                                      

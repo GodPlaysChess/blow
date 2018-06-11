@@ -5,19 +5,23 @@ version:             0.1.0.0
 homepage:            https://github.com/githubuser/blow#readme
 license:             BSD3
 license-file:        LICENSE
-author:              Author name here
+author:              Gleb Parakhonskiy
 maintainer:          example@example.com
-copyright:           2018 Author name here
+copyright:           Gleb Parakhonskiy
 category:            Web
 build-type:          Simple
 cabal-version:       >=1.10
 extra-source-files:  README.md
 
-executable blow
-  hs-source-dirs:      src
-  main-is:             Main.hs
+library
+  hs-source-dirs:      src  
   default-language:    Haskell2010
   other-extensions:    OverloadedStrings
+  exposed-modules:     LibMain
+                      , BayesController
+                      , Probability.Serialize.BayesRepr
+                      , Probability.Classifier
+                      
   build-depends:       base >= 4.7 && < 5
                       , scotty
                       , text
@@ -32,8 +36,12 @@ executable blow
                       , containers
                       , unordered-containers
                       , hashable
-                      --, serialise == 0.2.*
-                      --, cborg == 0.2.*
+
+executable blow
+  hs-source-dirs:      exc  
+  main-is:             Main.hs
+  build-depends:       base >= 4.7 && < 5
+                      , blow
 
 test-suite unit-tests
   type:                 exitcode-stdio-1.0
@@ -43,6 +51,7 @@ test-suite unit-tests
   build-depends:        base
                         , hspec == 2.*
                         , hspec-discover
+                        , blow
   other-modules:
     Probability.Serialize.BayesReprSpec
   
