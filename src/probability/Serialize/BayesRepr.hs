@@ -1,6 +1,7 @@
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE ExplicitForAll    #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE ExplicitForAll     #-}
+{-# LANGUAGE FlexibleInstances  #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module Probability.Serialize.BayesRepr (
     fromModel
@@ -25,9 +26,11 @@ import           Probability.Classifier  (Class)
 import           Data.Text.Lazy          (Text)
 
 
-data BayesRepr a = BayesRepr (Set a) FrequencyList [Labeled a] deriving (Generic, Show)
+data BayesRepr a = BayesRepr (Set a) FrequencyList [Labeled a] deriving (Generic, Show, Eq)
 
-instance Show a => Show (Labeled a)
+deriving instance Show a => Show (Labeled a)
+deriving instance Eq a => Eq (Labeled a)
+
 instance Serialize (BayesRepr Class)
 
 instance Serialize (Labeled Class) where
