@@ -8,11 +8,11 @@ import           Probability.Classifier          (Class (..))
 import           Probability.Serialize.BayesRepr (BayesRepr (..))
 import           Test.Hspec
 
+import           Data.ByteString                 (empty)
 import           Data.Either                     (Either (Right))
 import           Data.Serialize                  (decode, encode, get, put)
 import           Data.Serialize.Get              (runGet)
 import           Data.Serialize.Put              (runPut)
-
 
 spec :: Spec
 spec = do
@@ -22,7 +22,8 @@ spec = do
 
   describe "Bayes Representation" $ do
     it "should be serialized properly" $ do
-       (decode (encode  basicBayes)) `shouldBe` (Right basicBayes)
+       (decode . encode) basicBayes `shouldBe` Right basicBayes
+       --(decode (encode  basicBayes)) `shouldBe` (Right basicBayes)
 
     -- it "returns the first element of an *arbitrary* list" $
       -- property $ \x xs -> head (x:xs) == (x :: Int)

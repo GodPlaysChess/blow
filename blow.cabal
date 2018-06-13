@@ -52,6 +52,12 @@ test-suite unit-tests
                         , hspec == 2.*
                         , hspec-discover
                         , blow
+                        , unordered-containers
+                        , cereal
+                        , containers
+                        , text
+                        , hext
+                        , bytestring
   other-modules:
     Probability.Serialize.BayesReprSpec
   

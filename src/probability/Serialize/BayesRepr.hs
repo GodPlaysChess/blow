@@ -15,6 +15,7 @@ import           Data.Set                (Set)
 
 import           Data.Hashable           (Hashable)
 import           Data.Serialize          (Serialize, get, put)
+import           Data.Serialize.Get      (getTwoOf)
 import           Data.Serialize.Put      (putTwoOf)
 import           Data.Text.Lazy.Encoding (decodeUtf8, encodeUtf8)
 import           GHC.Generics            (Generic)
@@ -23,6 +24,7 @@ import           NLP.Hext.NaiveBayes     (BayesModel (..), FrequencyList,
                                           Labeled (..))
 import           Probability.Classifier  (Class)
 
+import           Control.Monad           (liftM2)
 import           Data.Text.Lazy          (Text)
 
 
@@ -30,12 +32,12 @@ data BayesRepr a = BayesRepr (Set a) FrequencyList [Labeled a] deriving (Generic
 
 deriving instance Show a => Show (Labeled a)
 deriving instance Eq a => Eq (Labeled a)
+deriving instance Generic a => Generic (Labeled a)
 
 instance Serialize (BayesRepr Class)
 
 instance Serialize (Labeled Class) where
-      put (Labeled h l) = putTwoOf put put (h, l)
-      get = get
+      --put (Labeled h l) = putTwoOf put put (h, l)
 
 instance Serialize Text where
     put txt = put $ encodeUtf8 txt
