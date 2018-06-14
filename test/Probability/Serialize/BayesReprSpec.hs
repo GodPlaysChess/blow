@@ -3,9 +3,9 @@ module Probability.Serialize.BayesReprSpec (spec) where
 import qualified Data.HashMap.Lazy               as M (singleton)
 import qualified Data.Set                        as S (singleton)
 import           Data.Text.Lazy                  (pack)
-import           NLP.Hext.NaiveBayes             (Labeled (..))
+import           NLP.Hext.NaiveBayes             (BayesModel (..), Labeled (..))
 import           Probability.Classifier          (Class (..))
-import           Probability.Serialize.BayesRepr (BayesRepr (..))
+import           Probability.Serialize.BayesRepr ()
 import           Test.Hspec
 
 import           Data.ByteString                 (empty)
@@ -21,10 +21,8 @@ spec = do
       head [23 ..] `shouldBe` (23 :: Int)
 
   describe "Bayes Representation" $ do
-    it "should be serialized properly" $ do
-       (decode . encode) basicBayes `shouldBe` Right basicBayes
-       --(decode (encode  basicBayes)) `shouldBe` (Right basicBayes)
-
+    it "should serialize bayes model properly" $ do
+      (decode . encode) basicBayesModel `shouldBe` Right basicBayesModel
     -- it "returns the first element of an *arbitrary* list" $
       -- property $ \x xs -> head (x:xs) == (x :: Int)
 
@@ -32,9 +30,8 @@ spec = do
       -- evaluate (head []) `shouldThrow` anyException
 
 
-
-basicBayes :: BayesRepr Class
-basicBayes = BayesRepr
-                (S.singleton Positive)
-                (M.singleton (pack "Hello") 5)
-                [Labeled (M.singleton (pack "hello") 1) Negative]
+basicBayesModel :: BayesModel Class
+basicBayesModel = BayesModel
+                   (S.singleton Positive)
+                   (M.singleton (pack "Hello") 5)
+                   [Labeled (M.singleton (pack "hello") 1) Negative]

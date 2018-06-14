@@ -20,7 +20,7 @@ import           Data.Text.Lazy                  as T (Text, lines, pack, span,
                                                        strip, unpack)
 import qualified Data.Text.Lazy.IO               as T (readFile)
 import           Probability.Classifier          (Class)
-import           Probability.Serialize.BayesRepr (fromModel, toModel)
+import           Probability.Serialize.BayesRepr ()
 import qualified System.IO                       (readFile)
 import           Text.Read                       (readMaybe)
 
@@ -28,13 +28,11 @@ import           Text.Read                       (readMaybe)
 readModel :: IO (Either String (BayesModel Class))
 readModel = do
                 file <- BS.readFile storagePath
-                let bayesRepr = S.decode file
-                let bayesModel = toModel <$> bayesRepr
-                return bayesModel
+                return $ S.decode file
 
 -- writes model to the file
 persistModel :: BayesModel Class -> IO ()
-persistModel = BS.writeFile storagePath . S.encode . fromModel
+persistModel = BS.writeFile storagePath . S.encode
 
 -- updates the model given additional information
 updateModel :: BayesModel Class -> [(T.Text, Class)] -> BayesModel Class
