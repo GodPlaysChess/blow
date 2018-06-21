@@ -1,33 +1,55 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Probability.Serialize.BayesReprSpec (spec) where
 
-import qualified Data.HashMap.Lazy               as M (singleton)
-import qualified Data.Set                        as S (singleton)
-import           Data.Text.Lazy                  (pack)
-import           NLP.Hext.NaiveBayes             (BayesModel (..), Labeled (..))
-import           Probability.Classifier          (Class (..))
-import           Probability.Serialize.BayesRepr ()
+import           Data.Hashable                     (Hashable)
+import qualified Data.HashMap.Lazy                 as M (HashMap, fromList,
+                                                         singleton)
+import qualified Data.Set                          as S (singleton)
+import           Data.Text.Lazy                    (pack)
+import           NLP.Hext.NaiveBayes               (BayesModel (..),
+                                                    Labeled (..))
+import           Probability.Classifier            (Class (..))
+import           Probability.Serialize.BayesRepr   ()
 import           Test.Hspec
+import           Test.QuickCheck                   (property)
+import           Test.QuickCheck.Arbitrary         (Arbitrary, arbitrary,
+                                                    genericShrink, shrink)
+import           Test.QuickCheck.Arbitrary.Generic (genericArbitrary)
 
-import           Data.ByteString                 (empty)
-import           Data.Either                     (Either (Right))
-import           Data.Serialize                  (decode, encode, get, put)
-import           Data.Serialize.Get              (runGet)
-import           Data.Serialize.Put              (runPut)
+import           Control.Monad                     (liftM3)
+import           Data.ByteString                   (empty)
+import           Data.Either                       (Either (Right))
+import           Data.Serialize                    (decode, encode, get, put)
+import           Data.Serialize.Get                (runGet)
+import           Data.Serialize.Put                (runPut)
 
 spec :: Spec
 spec = do
-  describe "Prelude.head" $ do
-    it "returns the first element of a list" $ do
-      head [23 ..] `shouldBe` (23 :: Int)
-
-  describe "Bayes Representation" $ do
-    it "should serialize bayes model properly" $ do
+  describe "Serialization of BayesModel" $ do
+    it "should work properly" $ do
       (decode . encode) basicBayesModel `shouldBe` Right basicBayesModel
-    -- it "returns the first element of an *arbitrary* list" $
-      -- property $ \x xs -> head (x:xs) == (x :: Int)
+
+    -- it "deconding encoded instance should give back same instance" $
+    --     property $ \x -> (decode . encode) x == Right (x :: BayesModel Class)
 
     -- it "throws an exception if used with an empty list" $ do
       -- evaluate (head []) `shouldThrow` anyException
+
+
+
+-- instance (Hashable k, Eq k, Arbitrary k, Arbitrary v) => Arbitrary (M.HashMap k v) where
+--   arbitrary = fmap M.fromList arbitrary
+--   shrink = genericShrink
+
+-- instance Arbitrary (Labeled Class) where
+--   arbitrary = genericArbitrary
+--   shrink = genericShrink
+
+
+-- instance Arbitrary (BayesModel Class) where
+--   arbitrary = genericArbitrary
+--   shrink = genericShrink
 
 
 basicBayesModel :: BayesModel Class

@@ -3,7 +3,7 @@ packages:
 - .
 extra-deps:
 - hext-0.1.0.4
-resolver: lts-10.5
+resolver: lts-11.13
 
 # Control whether we use the GHC we find on the path
 # system-ghc: true

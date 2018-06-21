@@ -51,6 +51,8 @@ test-suite unit-tests
   build-depends:        base
                         , hspec == 2.*
                         , hspec-discover
+                        , QuickCheck
+                        , generic-arbitrary
                         , blow
                         , unordered-containers
                         , cereal
@@ -58,6 +60,8 @@ test-suite unit-tests
                         , text
                         , hext
                         , bytestring
+                        , hashable
+                        , hspec-wai
   other-modules:
-    Probability.Serialize.BayesReprSpec
+  --  Probability.Serialize.BayesReprSpec
   

@@ -4,12 +4,15 @@ module BayesController(
       refineModel
     , classifyFile
     , initializeModel
+    , initializeModelT
 ) where
 
 import           NLP.Hext.NaiveBayes             (BayesModel, emptyModel,
                                                   runBayes, teach)
 
 import           Control.Monad                   (forM)
+import           Control.Monad.Trans.Class       (lift)
+import           Control.Monad.Trans.Reader      (ReaderT, ask)
 import           Data.Bitraversable              (bitraverse)
 import           Data.ByteString                 as BS (readFile, writeFile)
 import qualified Data.ByteString.Char8           as C8 (unpack)
@@ -61,17 +64,51 @@ initializeModel path = do
     classificationFile <- T.readFile (path ++ "/classification")
     let classification = readClassification classificationFile
     classifiedDocs <- forM classification $ bitraverse (T.readFile . (path ++) . unpack) pure
-    persistModel (updateModel emptyModel classifiedDocs)
-
-readClassification :: Text -> [(Text, Class)]
-readClassification file = do
-    line <- T.lines file
-    let (text, cltxt) = T.span (== '|') line
-    cl <- maybeToList . readMaybe . unpack . strip $ cltxt
-    return (text, cl)
+    persistModel (updateModel emptyModel classifiedDocs) where
+        readClassification :: Text -> [(Text, Class)]
+        readClassification file = do
+            line <- T.lines file
+            let (text, cltxt) = T.span (== '|') line
+            cl <- maybeToList . readMaybe . unpack . strip $ cltxt
+            return (text, cl)
 
 -- path for serialized BayesModel
 storagePath :: FilePath
 storagePath = "./dist/resources/modelstorage/bayesmodel"
 
 -- mapTuple = join (***)
+
+{- same inside the ReaderT -}
+
+-- writes model to the path, specified in the environment
+persistModelT :: BayesModel Class -> ReaderT FilePath IO ()
+persistModelT bm = do
+        storagePathR <- ask
+        lift $ (BS.writeFile storagePathR . S.encode) bm
+
+--reads model from the file, specified in the environment
+readModelT :: ReaderT FilePath IO (Either String (BayesModel Class))
+readModelT = do
+                storagePathR <- ask
+                file <- lift $ BS.readFile storagePath
+                return $ S.decode file
+
+classifyFileT :: FilePath -> ReaderT FilePath IO String
+classifyFileT filePath = do
+                            model <- fromRight emptyModel <$> readModelT
+                            modelToClassify <- lift $ BS.readFile filePath
+                            let result = runBayes model (C8.unpack modelToClassify)
+                            return $ "The review is " ++ show result
+
+initializeModelT :: FilePath -> ReaderT FilePath IO ()
+initializeModelT path = do
+    classificationFile <- lift $ T.readFile (path ++ "/classification")
+    let classification = readClassificationT classificationFile
+    classifiedDocs <- lift $ forM classification $ bitraverse (T.readFile . (path ++) . unpack) pure
+    persistModelT (updateModel emptyModel classifiedDocs) where
+        readClassificationT :: Text -> [(Text, Class)]
+        readClassificationT file = do
+            line <- T.lines file
+            let (text, cltxt) = T.span (== '|') line
+            cl <- maybeToList . readMaybe . unpack . strip $ cltxt
+            return (text, cl)

@@ -4,6 +4,8 @@
 {-# LANGUAGE StandaloneDeriving #-}
 
 module Probability.Serialize.BayesRepr (
+    fromModel,
+    toModel
   ) where
 
 import           Data.Hashable           (Hashable)
@@ -17,13 +19,15 @@ import           NLP.Hext.NaiveBayes     (BayesModel (..), FrequencyList,
                                           Labeled (..))
 import           Probability.Classifier  (Class)
 
-
+--newtype BayesRepr1 a = BayesRepr1 (BayesModel a) deriving (Generic, Show, Eq)
 data BayesRepr a = BayesRepr (Set a) FrequencyList [Labeled a] deriving (Generic, Show, Eq)
 
 deriving instance Show a => Show (Labeled a)
 deriving instance Eq a => Eq (Labeled a)
 deriving instance Generic a => Generic (Labeled a)
 deriving instance Eq a => Eq (BayesModel a)
+
+deriving instance Generic (BayesModel Class)
 
 instance Serialize (BayesRepr Class)
 instance Serialize (BayesModel Class) where
@@ -48,10 +52,6 @@ toModel :: BayesRepr a -> BayesModel a
 toModel (BayesRepr a b c) = BayesModel a b c
 
 -- TODO
--- implement conversions >>
--- tests for conversions >>
--- redifine them in terms of natural transformations >>
 -- check what is written in the file >>
--- *(may be try to avoid conversions as well and derive serializer directly)
 
 
