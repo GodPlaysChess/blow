@@ -3,6 +3,7 @@ packages:
 - .
 extra-deps:
 - hext-0.1.0.4
+- hspec-expectations-match-0.2.0.0
 resolver: lts-11.13
 
 # Control whether we use the GHC we find on the path
