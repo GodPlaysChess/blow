@@ -1,10 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module BayesController(
-    initializeModelT
-    , classifyFileT
+    initializeModelT    
     , refineModelT
-    , readModelT
+    , classifyModelT
+    -- those 2 should be private 
+    , classifyFileT
+    , readModelT    
 ) where
 
 import           NLP.Hext.NaiveBayes             (BayesModel, emptyModel,
@@ -46,7 +48,7 @@ readModelT = do
                 return $ S.decode file
 
 --classifies the model from the file
-classifyFileT :: FilePath -> ReaderT FilePath IO String
+classifyFileT :: FilePath -> ReaderT FilePath IO Class
 classifyFileT f = classifyModelT =<< lift (BS.readFile f)
 
 --  initialize the model based on models, stored in ./initial_training_set and classified accordingly to /initial_training_set/classification
@@ -71,8 +73,8 @@ refineModelT additionalModel cl = do
                             let newModel = updateModel initialModel [(additionalModel, cl)]
                             persistModelT newModel
 
-classifyModelT :: ByteString -> ReaderT FilePath IO String
+classifyModelT :: ByteString -> ReaderT FilePath IO Class
 classifyModelT modelToClassify = do
                             model <- fromRight emptyModel <$> readModelT
-                            let result = runBayes model (C8.unpack modelToClassify)
-                            return $ "The review is " ++ show result
+                            return $ runBayes model (C8.unpack modelToClassify)
+                            
