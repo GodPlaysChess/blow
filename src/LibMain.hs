@@ -3,9 +3,8 @@
 
 module LibMain where
 
-import           Web.Scotty                 as Rest (get, html, scotty, text)
 import           Web.Scotty.Trans           as RestT (ScottyT, get, scottyT,
-                                                      text)
+                                                      text, post, body)
 
 import           BayesController
 import           Control.Monad              ((>>))
@@ -15,6 +14,7 @@ import           Control.Monad.Trans.Reader (ReaderT, ask, local, runReaderT)
 import           Data.Text.Lazy             as T (pack)
 import           Data.Text.Lazy             (Text)
 import           Probability.Classifier     (Class (..))
+import Data.ByteString.Lazy(toStrict)
 
 main :: IO ()
 main = scottyT 3001 (`runReaderT` rootPath) appRoutes
@@ -34,6 +34,13 @@ getInitialize = RestT.get "/hello" $
 
 getConfig :: ScottyT Text (ReaderT FilePath IO) ()
 getConfig = RestT.get "/conf" $ lift ask >>= RestT.text . pack
+
+postClassify :: ScottyT Text (ReaderT FilePath IO) ()
+postClassify = RestT.post "/classify" $ do
+              model <- body
+              classification <- lift $ classifyModelT (toStrict model)
+              RestT.text $ pack $ show classification
+
 
 -- scottyMain :: IO ()
 -- scottyMain = scotty 3000 $ do
