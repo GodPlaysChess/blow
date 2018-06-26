@@ -12,6 +12,8 @@ import           System.IO.Unsafe              (unsafePerformIO)
 import           Test.Hspec
 import           Test.Hspec.Expectations.Match (shouldMatch)
 import          Probability.Classifier
+import Data.Bitraversable(bitraverse)
+
 
 
 spec :: Spec
@@ -28,8 +30,9 @@ spec = do
                      afterTestDelete
                      (runReaderT (do 
                         _ <- refineModelT "Love story" Positive
-                        classifyModelT "Love story")
-                        testModelStorage) >>= (`shouldBe` Positive)
+                        _ <- refineModelT "Horror story" Negative
+                        bitraverse classifyModelT classifyModelT ("Love poem" , "horror poem"))
+                        testModelStorage) >>= (`shouldBe` (Positive, Negative))
 
 
         -- it "classify model" $
