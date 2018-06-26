@@ -10,33 +10,26 @@ import           Data.Either                   (Either (Right), isRight)
 import           System.Directory              (removeFile)
 import           System.IO.Unsafe              (unsafePerformIO)
 import           Test.Hspec
-import           Test.Hspec.Expectations.Match (shouldMatch)
 import          Probability.Classifier
-import Data.Bitraversable(bitraverse)
-
+import           Data.Bitraversable(bitraverse)
 
 
 spec :: Spec
-spec = do
+spec = around_ withModelInitialised $ do
     describe "Controller" $ do
         it "initialize model should create a file with parsable model" $
-                bracket_ beforeTestInitialise
-                         afterTestDelete
                          (runReaderT readModelT testModelStorage)  >>= (`shouldSatisfy` isRight)
 
-
         it "after refinement the model shall be classified correcly" $
-            bracket_ beforeTestInitialise
-                     afterTestDelete
                      (runReaderT (do 
                         _ <- refineModelT "Love story" Positive
                         _ <- refineModelT "Horror story" Negative
                         bitraverse classifyModelT classifyModelT ("Love poem" , "horror poem"))
                         testModelStorage) >>= (`shouldBe` (Positive, Negative))
 
-
-        -- it "classify model" $
-        --     pending
+withModelInitialised :: IO () -> IO ()
+withModelInitialised        = bracket_ beforeTestInitialise
+                                       afterTestDelete                                        
 
 testModelStorage :: FilePath
 testModelStorage = "./test/resources/modelstorage"
