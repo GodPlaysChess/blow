@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module BayesControllerSpec(spec) where
+module Controller.BayesControllerSpec(spec) where
 
-import           BayesController            (classifyModelT, initializeModelT,
-                                             readModelT, refineModelT)
 import           Control.Exception.Base     (bracket_)
 import           Control.Monad.Trans.Reader (runReaderT)
+import           Controller.BayesController (classifyModelT, initializeModelT,
+                                             readModelT, refineModelT)
 import           Data.Bitraversable         (bitraverse)
+import           Data.Classification
 import           Data.Either                (isRight)
-import           Probability.Classifier
 import           System.Directory           (removeFile)
 import           Test.Hspec
 
@@ -28,8 +28,7 @@ spec = around_ withModelInitialised $ do
 
 
 withModelInitialised :: IO () -> IO ()
-withModelInitialised        = bracket_ beforeTestInitialise
-                                       afterTestDelete
+withModelInitialised = bracket_ beforeTestInitialise afterTestDelete
 
 testModelStorage :: FilePath
 testModelStorage = "./test/resources/modelstorage"

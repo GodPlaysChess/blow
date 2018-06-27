@@ -1,46 +1,11 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE OverloadedStrings #-}
+module LibMain(main) where
 
-module LibMain where
-
-import           Web.Scotty.Trans           as RestT (ScottyT, get, scottyT,
-                                                      text, post, body)
-
-import           BayesController
-import           Control.Monad              ((>>))
-import           Control.Monad.IO.Class     (liftIO)
-import           Control.Monad.Trans.Class  (lift)
-import           Control.Monad.Trans.Reader (ReaderT, ask, local, runReaderT)
-import           Data.Text.Lazy             as T (pack)
-import           Data.Text.Lazy             (Text)
-import           Probability.Classifier     (Class (..))
-import Data.ByteString.Lazy(toStrict)
+import           Control.Monad.Trans.Reader       (runReaderT)
+import           Route.TextClassificationResource (appRoutes)
+import           Web.Scotty.Trans                 as RestT (scottyT)
 
 main :: IO ()
 main = scottyT 3001 (`runReaderT` rootPath) appRoutes
-
--- this API is very incorrect and serves merely as a first iteration to check if the bayes classification makes sense
--- later it would be just | POST classify with the payload of the model and POST refine, with Model -> Class in a payload
-appRoutes :: ScottyT Text (ReaderT FilePath IO) ()
-appRoutes = do
-  getInitialize
-  getConfig
-  --postClassify
-  --postTrain
-
-getInitialize :: ScottyT Text (ReaderT FilePath IO) ()
-getInitialize = RestT.get "/hello" $
-             lift (initializeModelT initialTrainingPath) >> RestT.text "Initializing the model"
-
-getConfig :: ScottyT Text (ReaderT FilePath IO) ()
-getConfig = RestT.get "/conf" $ lift ask >>= RestT.text . pack
-
-postClassify :: ScottyT Text (ReaderT FilePath IO) ()
-postClassify = RestT.post "/classify" $ do
-              model <- body
-              classification <- lift $ classifyModelT (toStrict model)
-              RestT.text $ pack $ show classification
-
 
 -- scottyMain :: IO ()
 -- scottyMain = scotty 3000 $ do
@@ -63,8 +28,6 @@ controlDoc = "./dist/resources/to_classify"
 trainPath :: FilePath
 trainPath = "./dist/resources/to_train"
 
-initialTrainingPath :: FilePath
-initialTrainingPath = "./dist/resources/initial_training_set"
 
 rootPath :: FilePath
 rootPath = "./dist/resources/modelstorage/bayesmodel"

@@ -1,0 +1,116 @@
+hlint [COMMAND] ... [OPTIONS]
+
+Common flags:
+  -? --help                                Display help message
+  -V --version                             Print version information
+     --numeric-version                     Print just the version number
+  -v --verbose                             Loud verbosity
+  -q --quiet                               Quiet verbosity
+
+hlint [lint] [OPTIONS] [FILE/DIR]
+
+Flags:
+  -r --report[=FILE]                       Generate a report in HTML
+  -h --hint=FILE                           Hint/ignore file to use
+  -w --with=HINT                           Extra hints to use
+  -c --color[=always/never/auto] --colour  Color output (requires ANSI
+                                           terminal; auto means on when $TERM
+                                           is supported; by itself, selects
+                                           always)
+  -j --threads[=INT] --cmdthreads          Number of threads to use (-j for
+                                           all)
+  -i --ignore=HINT                         Ignore a particular hint
+  -s --show                                Show all ignored ideas
+  -e --extension=EXT                       File extensions to search (default
+                                           hs/lhs)
+  -X --language=EXTENSION                  Language extensions (Arrows,
+                                           NoCPP)
+  -u --utf8                                Use UTF-8 text encoding
+     --encoding=ENCODING                   Choose the text encoding
+     --cross                               Work between modules
+  -f --find=FILE                           Find hints in a Haskell file
+  -d --datadir=DIR                         Override the data directory
+  -p --path=ITEM                           Directory in which to search for
+                                           files
+     --cpp-define=NAME[=VALUE]             CPP #define
+     --cpp-include=DIR                     CPP include path
+     --cpp-file=FILE                       CPP pre-include file
+     --cpp-simple                          Use a simple CPP (strip # lines)
+     --cpp-ansi                            Use CPP in ANSI compatibility mode
+     --json                                Display hint data as JSON
+     --no-summary                          Do not show summary information
+  -o --only=HINT                           Specify which hints explicitly
+     --no-exit-code                        Do not give a negative exit if
+                                           hints
+     --serialise                           Serialise hint data for
+                                           consumption by apply-refact
+     --refactor                            Automatically invoke `refactor` to
+                                           apply hints
+     --refactor-options=OPTIONS            Options to pass to the `refactor`
+                                           executable
+     --with-refactor=ITEM                  Give the path to refactor
+Common flags:
+  -? --help                                Display help message
+  -V --version                             Print version information
+     --numeric-version                     Print just the version number
+  -v --verbose                             Loud verbosity
+  -q --quiet                               Quiet verbosity
+
+hlint grep [OPTIONS] PATTERN [FILE/DIR]
+
+Flags:
+  -e --extension=EXT                       File extensions to search (default
+                                           hs/lhs)
+  -X --language=EXTENSION                  Language extensions (Arrows,
+                                           NoCPP)
+  -u --utf8                                Use UTF-8 text encoding
+     --encoding=ENCODING                   Choose the text encoding
+  -p --path=ITEM                           Directory in which to search for
+                                           files
+     --cpp-define=NAME[=VALUE]             CPP #define
+     --cpp-include=DIR                     CPP include path
+     --cpp-file=FILE                       CPP pre-include file
+     --cpp-simple                          Use a simple CPP (strip # lines)
+     --cpp-ansi                            Use CPP in ANSI compatibility mode
+Common flags:
+  -? --help                                Display help message
+  -V --version                             Print version information
+     --numeric-version                     Print just the version number
+  -v --verbose                             Loud verbosity
+  -q --quiet                               Quiet verbosity
+
+hlint test [OPTIONS]
+
+Flags:
+     --proof=FILE                          Isabelle/HOLCF theory file
+  -h --hint=FILE                           Hint/ignore file to use
+  -d --datadir=DIR                         Override the data directory
+  -r --report[=FILE]                       Generate a report in HTML
+  -w --with=HINT                           Extra hints to use
+     --tempdir=ITEM                        Where to put temporary files (not
+                                           cleaned up)
+     --quickcheck                          Use QuickCheck to check the hints
+     --typecheck                           Use GHC to type check the hints
+Common flags:
+  -? --help                                Display help message
+  -V --version                             Print version information
+     --numeric-version                     Print just the version number
+  -v --verbose                             Loud verbosity
+  -q --quiet                               Quiet verbosity
+
+HLint gives hints on how to improve Haskell code.
+
+To check all Haskell files in 'src' and generate a report type:
+  hlint src --report
+
+hlint hse [OPTIONS] [FILE/DIR]
+
+Flags:
+  -X --language=EXTENSION                  Language extensions (Arrows,
+                                           NoCPP)
+Common flags:
+  -? --help                                Display help message
+  -V --version                             Print version information
+     --numeric-version                     Print just the version number
+  -v --verbose                             Loud verbosity
+  -q --quiet                               Quiet verbosity

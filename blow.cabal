@@ -18,9 +18,10 @@ library
   default-language:    Haskell2010
   other-extensions:    OverloadedStrings
   exposed-modules:     LibMain
-                      , BayesController
-                      , Probability.Serialize.BayesRepr
-                      , Probability.Classifier
+                      , Controller.BayesController
+                      , Data.BayesRepr
+                      , Data.Classification
+                      , Route.TextClassificationResource
                       
   build-depends:       base >= 4.7 && < 5
                       , scotty
@@ -35,6 +36,7 @@ library
                       , containers
                       , unordered-containers
                       , hashable
+                      , aeson
 
 executable blow
   hs-source-dirs:      exc  
@@ -64,6 +66,5 @@ test-suite unit-tests
                         , transformers
                         , hspec-expectations-match
                         , directory
-  other-modules:
-  --  Probability.Serialize.BayesReprSpec
-  
+  other-modules:  
+

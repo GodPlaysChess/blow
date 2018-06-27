@@ -2,8 +2,8 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Probability.Classifier (        
-        Class(..)    
+module Data.Classification (
+        Classification(..)
 )
 
 where
@@ -11,6 +11,6 @@ where
 import           Data.Serialize (Serialize)
 import           GHC.Generics   (Generic)
 
-data Class = Positive | Negative deriving (Eq, Show, Ord, Generic, Read)
+data Classification = Positive | Negative deriving (Eq, Show, Ord, Generic, Read)
 
-instance Serialize Class
+instance Serialize Classification
