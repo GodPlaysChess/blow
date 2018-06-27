@@ -22,12 +22,6 @@ main = scottyT 3001 (`runReaderT` rootPath) appRoutes
 --     Rest.text "refined the model, given the additional classified input. to be implemented"
 
 -- path for the model to be classified
-controlDoc :: FilePath
-controlDoc = "./dist/resources/to_classify"
-
-trainPath :: FilePath
-trainPath = "./dist/resources/to_train"
-
 
 rootPath :: FilePath
 rootPath = "./dist/resources/modelstorage/bayesmodel"

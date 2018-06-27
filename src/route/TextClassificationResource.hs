@@ -4,12 +4,10 @@
 module Route.TextClassificationResource(appRoutes) where
 
 import           Control.Monad              ((>>))
-import           Control.Monad.IO.Class     (liftIO)
 import           Control.Monad.Trans.Class  (lift)
-import           Control.Monad.Trans.Reader (ReaderT, ask, local, runReaderT)
+import           Control.Monad.Trans.Reader (ReaderT, ask)
 import           Controller.BayesController
 import           Data.ByteString.Lazy       (toStrict)
-import           Data.Classification        (Classification (..))
 import           Data.Text.Lazy             as T (pack)
 import           Data.Text.Lazy             (Text)
 import           Web.Scotty.Trans           as RestT (ScottyT, body, file, get,
