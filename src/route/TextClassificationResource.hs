@@ -10,7 +10,7 @@ import           Controller.BayesController
 import           Data.ByteString.Lazy       (toStrict)
 import           Data.Text.Lazy             as T (pack)
 import           Data.Text.Lazy             (Text)
-import           Web.Scotty.Trans           as RestT (ScottyT, body, file, get,
+import           Web.Scotty.Trans           as RestT (ScottyT, body, files, get,
                                                       post, scottyT, text)
 
 appRoutes :: ScottyT Text (ReaderT FilePath IO) ()
@@ -18,6 +18,7 @@ appRoutes = do
   getInitialize
   getConfig
   postClassify
+  testFileUpload
   -- postTrain
 
 getInitialize :: ScottyT Text (ReaderT FilePath IO) ()
@@ -32,6 +33,12 @@ postClassify = RestT.post "/classify" $ do
               model <- body
               classification <- lift $ classifyModelT (toStrict model)
               RestT.text $ pack $ "classified as: " ++ show classification
+
+testFileUpload :: ScottyT Text (ReaderT FilePath IO) ()
+testFileUpload = RestT.post "/upload" $ do 
+              (content, fileinfo) <- head <$> files
+              RestT.text $ content
+
 
 -- postTrain :: ScottyT Text (ReaderT FilePath IO) ()
 -- postTrain = RestT.post "/train" $ do
