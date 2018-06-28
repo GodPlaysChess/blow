@@ -35,9 +35,9 @@ postClassify = RestT.post "/classify" $ do
               RestT.text $ pack $ "classified as: " ++ show classification
 
 testFileUpload :: ScottyT Text (ReaderT FilePath IO) ()
-testFileUpload = RestT.post "/upload" $ do 
+testFileUpload = RestT.post "/upload" $ do
               (content, fileinfo) <- head <$> files
-              RestT.text $ content
+              RestT.text content
 
 
 -- postTrain :: ScottyT Text (ReaderT FilePath IO) ()
