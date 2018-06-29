@@ -12,6 +12,9 @@ import           Data.Text.Lazy             as T (pack)
 import           Data.Text.Lazy             (Text)
 import           Web.Scotty.Trans           as RestT (ScottyT, body, files, get,
                                                       post, scottyT, text)
+import Data.Foldable(fold)
+import Data.Text.Lazy.Encoding(decodeUtf8)
+import Network.Wai.Parse (fileContent)
 
 appRoutes :: ScottyT Text (ReaderT FilePath IO) ()
 appRoutes = do
@@ -36,8 +39,10 @@ postClassify = RestT.post "/classify" $ do
 
 testFileUpload :: ScottyT Text (ReaderT FilePath IO) ()
 testFileUpload = RestT.post "/upload" $ do
-              (content, fileinfo) <- head <$> files
-              RestT.text content
+              fs <- files
+              (meta, bytes) <- head <$> files
+              RestT.text $ (decodeUtf8 . fileContent) bytes
+              --RestT.text $ fold $ (decodeUtf8 . fileContent . snd) <$> fs 
 
 
 -- postTrain :: ScottyT Text (ReaderT FilePath IO) ()

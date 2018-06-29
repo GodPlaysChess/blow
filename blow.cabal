@@ -37,6 +37,7 @@ library
                       , unordered-containers
                       , hashable
                       , aeson
+                      , wai-extra
 
 executable blow
   hs-source-dirs:      exc  
@@ -67,4 +68,5 @@ test-suite unit-tests
                         , hspec-expectations-match
                         , directory
   other-modules:  
-
+          Controller.BayesControllerSpec
+          , Data.BayesReprSpec
