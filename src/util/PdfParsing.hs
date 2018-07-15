@@ -1,0 +1,135 @@
+{-# LANGUAGE OverloadedStrings #-}
+
+module Util.PdfParsing
+(
+  getContent
+  -- , example
+)
+where
+
+import           Data.ByteString.Lazy    (ByteString)
+import           Data.Text.Lazy          (Text)
+import           Data.Text.Lazy.Encoding (decodeUtf8)
+
+-- import           Control.Monad
+-- import           Control.Monad.Trans.Class
+-- import           Control.Monad.Trans.State
+-- import qualified Data.ByteString.Lazy                as BSL
+-- import           Data.Int
+-- import           Data.IntSet                         (IntSet)
+-- import qualified Data.IntSet                         as IntSet
+-- import           System.Environment
+-- import           System.IO
+-- import qualified System.IO.Streams                   as Streams
+
+-- import           Pdf.Toolbox.Core
+-- import           Pdf.Toolbox.Document
+-- import           Pdf.Toolbox.Document.Internal.Types
+
+
+
+
+-- import           Control.Monad
+-- import           Control.Monad.Trans.Class
+-- import           Control.Monad.Trans.State
+-- import qualified Data.ByteString.Lazy                as BSL
+-- import           Data.Int
+-- import           Data.IntSet                         (IntSet)
+-- import qualified Data.IntSet                         as IntSet
+-- import           System.Environment
+-- import           System.IO
+-- import qualified System.IO.Streams                   as Streams
+
+-- import           Pdf.Toolbox.Core
+-- import           Pdf.Toolbox.Document
+-- import           Pdf.Toolbox.Document.Internal.Types
+
+
+
+
+-- main :: IO ()
+-- main =
+--   withBinaryFile "test/resources/pdfs/iteratees.pdf" ReadMode $ \handle ->
+--       runPdfWithHandle handle knownFilters $ do
+--       pdf <- pdfWithHandle handle
+--       doc <- document pdf
+--       catalog <- documentCatalog doc
+--       rootNode <- catalogPageNode catalog
+--       count <- pageNodeNKids rootNode
+--       print count
+--       -- the first page of the document
+--       page <- pageNodePageByNum rootNode 0
+--       print page
+--       return ()
+
+-- runPdf (fromLazyByteString bs) knownFilters
+getContent :: ByteString -> Text
+getContent = decodeUtf8
+
+-- toPdf :: ByteString -> Pdf
+-- toPdf = undefined
+
+-- example :: IO ()
+-- example = do
+--   res <- withBinaryFile "./test/resources/pdfs/iteratees.pdf" ReadMode $ \handle ->
+--     runPdfWithHandle handle knownFilters $
+--     -- we take each object only once, and object cache
+--     -- will only slow down everything
+--     withoutObjectCache $ do
+--     encrypted <- isEncrypted
+--     when encrypted $ do
+--       ok <- setUserPassword defaultUserPassword
+--       unless ok $ error "Need user password"
+--     Document _ tr <- document
+
+--     let
+--         loop :: Object Int64 -> StateT IntSet (PdfWriter (Pdf IO)) ()
+--         loop (ODict (Dict vals)) = forM_ vals $ loop . mapObject (error "impossible") . snd
+--         loop (OArray (Array vals)) = forM_ vals $ loop . mapObject (error "impossible")
+--         loop (ORef r@(Ref index _)) = do
+--           -- check that the object is not already written.
+--           -- necessary to prevent circles
+--           member <- gets $ IntSet.member index
+--           if member
+--             then return ()
+--             else do
+--               o <- lift $ lift $ lookupObject r
+--               lift ( lift $ loadStream r o) >>= lift . writeObject r
+--               modify $ IntSet.insert index
+--               loop o
+--         loop _ = return ()
+
+--     runPdfWriter Streams.stdout $ do
+--       flip evalStateT IntSet.empty $ do
+--         lift writePdfHeader
+--         -- traverse all the objects starting from trailer
+--         -- and write out all the indirect objects found
+--         loop (ODict tr)
+--         -- There are no more xrefs, so clean prev key
+--         lift $ writeXRefTable 0 (deleteValueForKey "Prev" tr)
+--   case res of
+--     Right _ -> return ()
+--     Left e  -> hPutStrLn stderr (show e)
+
+-- -- Load stream content as lazy bytestring. Try to decode it,
+-- -- but if it is not possible (e.g. streams filter is not found),
+-- -- then load raw content. It may not work with encrypted documents
+-- loadStream :: Ref -> Object Int64 -> Pdf IO (Object BSL.ByteString)
+-- loadStream r (OStream s) = loadDecodedStream r s `catchE` \_ -> loadRawStream s
+-- loadStream _ o = return $ mapObject (error "impossible") o
+
+-- loadDecodedStream :: Ref -> Stream Int64 -> Pdf IO (Object BSL.ByteString)
+-- loadDecodedStream r s = do
+--   Stream d is <- streamContent r s
+--   content <- liftIO $ BSL.fromChunks `liftM` Streams.toList is
+--   -- update length and remove filter
+--   let d' = setValueForKey "Length" (ONumber $ NumInt $ fromIntegral $ BSL.length content) $ deleteValueForKey "Filter" d
+--   return $ OStream $ Stream d' content
+
+-- loadRawStream :: Stream Int64 -> Pdf IO (Object BSL.ByteString)
+-- loadRawStream s@(Stream d _) = do
+--   l <- lookupDict "Length" d >>= deref >>= fromObject >>= intValue
+--   ris <- getRIS
+--   Stream _ is <- rawStreamContent ris l s
+--   content <- liftIO $ BSL.fromChunks `liftM` Streams.toList is
+--   return $ OStream $ Stream d content

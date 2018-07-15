@@ -22,6 +22,7 @@ library
                       , Data.BayesRepr
                       , Data.Classification
                       , Route.TextClassificationResource
+                      , Util.PdfParsing
                       
   build-depends:       base >= 4.7 && < 5
                       , scotty
@@ -38,6 +39,7 @@ library
                       , hashable
                       , aeson
                       , wai-extra
+                      , io-streams
 
 executable blow
   hs-source-dirs:      exc  
@@ -70,3 +72,4 @@ test-suite unit-tests
   other-modules:  
           Controller.BayesControllerSpec
           , Data.BayesReprSpec
+          , Route.TextClassificationResourceSpec

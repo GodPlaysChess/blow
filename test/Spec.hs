@@ -4,6 +4,7 @@ import           Test.Hspec
 
 import qualified Controller.BayesControllerSpec
 import qualified Data.BayesReprSpec
+import qualified Route.TextClassificationResourceSpec
 
 
 main :: IO ()
@@ -13,3 +14,4 @@ spec :: Spec
 spec = do
   describe "BayesController"   Controller.BayesControllerSpec.spec
   describe "BayesRepr"         Data.BayesReprSpec.spec
+  describe "Routes"            Route.TextClassificationResourceSpec.spec

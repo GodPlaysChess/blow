@@ -24,8 +24,8 @@ import           Data.Classification        (Classification)
 import           Data.Either                (fromRight)
 import           Data.Maybe                 (maybeToList)
 import           Data.Serialize             as S (decode, encode)
-import           Data.Text.Lazy             as T (Text, lines, pack, span,
-                                                  strip, unpack)
+import           Data.Text.Lazy             as T (Text, lines, span, strip,
+                                                  unpack)
 import qualified Data.Text.Lazy.IO          as T (readFile)
 import           Text.Read                  (readMaybe)
 
